@@ -17,15 +17,15 @@ async function loadWords() {
     const seen = new Set();
     for (const [index, item] of data.words.entries()) {
       const source = new URL(item.source);
-      if (source.protocol !== 'https:' || source.hostname !== 'english.elpais.com' ||
-          typeof item.english !== 'string' || typeof item.korean !== 'string' || seen.has(item.english)) {
+      if (source.protocol !== 'https:' || source.hostname !== 'cnnespanol.cnn.com' ||
+          typeof item.spanish !== 'string' || typeof item.korean !== 'string' || seen.has(item.spanish)) {
         throw new Error('단어 데이터를 확인할 수 없습니다.');
       }
-      seen.add(item.english);
+      seen.add(item.spanish);
       const card = document.createElement('article');
       for (const [tag, className, text] of [
         ['span', 'number', String(index + 1).padStart(2, '0')],
-        ['h2', '', item.english], ['p', 'meaning', item.korean]
+        ['h2', '', item.spanish], ['p', 'meaning', `EN · ${item.english}`], ['p', 'meaning', `KO · ${item.korean}`]
       ]) {
         const node = document.createElement(tag);
         node.className = className;
@@ -37,7 +37,7 @@ async function loadWords() {
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.textContent = '원문 기사 읽기 ↗';
-      link.setAttribute('aria-label', `${item.english} 출처 기사 (새 창)`);
+      link.setAttribute('aria-label', `${item.spanish} 출처 기사 (새 창)`);
       card.appendChild(link);
       rows.appendChild(card);
     }

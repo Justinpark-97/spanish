@@ -1,4 +1,4 @@
-name: Daily English Words
+name: Daily Spanish Words
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       skip_translation:
-        description: "번역 없이 영어 단어만 배포"
+        description: "번역 없이 스페인어 단어만 배포"
         type: boolean
         default: false
 

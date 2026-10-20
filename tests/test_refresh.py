@@ -5,25 +5,25 @@ from scripts.refresh import candidates_from_headlines, validate_translations, Tr
 class PipelineTests(unittest.TestCase):
     def test_only_publisher_article_links_and_unique_words(self):
         values = candidates_from_headlines([
-            ("Climate climate changes after storms", "https://english.elpais.com/climate/2026-10-20/news.html"),
+            ("Economía economía cambia después tormentas", "https://cnnespanol.cnn.com/2026/10/20/economia/noticia"),
             ("Malicious injected words", "https://example.com/news.html"),
-            ("Another foreign headline", "https://english.elpais.com.evil.test/news.html"),
+            ("Another foreign headline", "https://cnnespanol.cnn.com.evil.test/2026/10/20/noticia"),
         ])
-        self.assertEqual(set(values), {"climate", "changes", "storms"})
+        self.assertEqual(set(values), {"economía", "cambia", "tormentas"})
 
     def test_duplicate_translation_rejected(self):
-        result = Translations(words=[Translation(english="climate", korean="기후")] * 2)
+        result = Translations(words=[Translation(spanish="clima", english="climate", korean="기후")] * 2)
         with self.assertRaises(ValueError):
-            validate_translations(result, ["climate", "storms"])
+            validate_translations(result, ["clima", "tormentas"])
 
     def test_non_korean_translation_rejected(self):
         with self.assertRaises(ValueError):
-            validate_translations(Translations(words=[Translation(english="climate", korean="weather")]), ["climate"])
+            validate_translations(Translations(words=[Translation(spanish="clima", english="climate", korean="weather")]), ["clima"])
 
     def test_valid_translation(self):
         self.assertEqual(validate_translations(Translations(words=[
-            Translation(english="climate", korean="기후")
-        ]), ["climate"]), {"climate": "기후"})
+            Translation(spanish="clima", english="climate", korean="기후")
+        ]), ["clima"]), {"clima": {"english": "climate", "korean": "기후"}})
 
 
 if __name__ == "__main__":

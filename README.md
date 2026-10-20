@@ -1,37 +1,23 @@
-# Spanish · Daily English Words
+# Spanish · Daily Words
 
-EL PAÍS 영어 뉴스 제목에서 매일 단어 20개를 무작위로 뽑고, OpenAI로 문맥에 맞는 한국어 뜻을 생성해 웹사이트에 게시합니다.
+CNN en Español (https://cnnespanol.cnn.com/) 기사 제목에서 매일 스페인어 단어 20개를 무작위 선정해 표시합니다. 번역을 사용하면 영어와 한국어 뜻을 함께 생성합니다.
 
-저장소 이름은 `spanish`이며 학습 언어는 영어 → 한국어입니다.
+## 실행 및 배포
 
-## 작동 방식
+- 웹사이트: https://justinpark-97.github.io/spanish/
+- 매일 한국 시간 08:00에 GitHub Actions 예약 실행. 예약은 지연되거나 누락될 수 있습니다.
+- Actions → Daily Spanish Words → Run workflow에서 `skip_translation`을 선택하면 API 비용 없이 실제 스페인어 단어와 출처 링크를 배포합니다.
+- 번역 사용 시 GitHub Actions Secrets의 `OPENAI_API_KEY`와 API 크레딧이 필요합니다. 모델은 Variables의 `OPENAI_MODEL`로 지정하며 기본값은 `gpt-4.1-mini`입니다.
+- Settings → Pages → Source: GitHub Actions.
+- 예약 실행은 번역을 사용합니다. 크레딧이 없으면 갱신에 실패하고 기존 배포는 유지됩니다.
 
-매일 한국 시간 오전 8시 예약 → 홈페이지 수집 → 차단되면 공식 영어판 RSS → 중복 없는 단어 20개 → AI 번역 및 검증 → JSON 생성 → GitHub Pages 배포.
+## 수집 범위
 
-- 수집 대상은 제목입니다. 본문 전체를 수집하거나 재게시하지 않습니다.
-- 공식 RSS: https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada
-- RSS 안내: https://elpais.com/info/rss/
-- 홈페이지의 robots.txt를 확인합니다. 차단 화면을 우회하지 않습니다.
-- 정규식과 기본 불용어 필터로 선정하므로 고유명사나 쉬운 단어가 포함될 수 있습니다.
-- 하루 내 중복은 없지만 과거 날짜의 단어가 다시 나올 수 있습니다.
-- 기사 후보는 방문 시점의 메인 화면 또는 피드이며 반드시 당일 발행 기사만은 아닙니다.
-- 수집·번역·검증이 실패하면 새 배포를 하지 않아 기존 페이지가 유지됩니다.
-- GitHub Actions 예약은 지연되거나 누락될 수 있으며 정확한 08:00 갱신을 보장하지 않습니다.
-- 공개 저장소에서 일정 기간 활동이 없으면 GitHub가 예약 실행을 비활성화할 수 있습니다. Actions에서 확인하세요.
+홈페이지의 기사 제목만 수집하며 본문 전체는 재게시하지 않습니다. robots.txt를 확인하고, 차단 화면을 우회하지 않습니다. 스페인어 악센트와 ñ를 보존하며 불용어와 영상 링크를 제외합니다. 고유명사는 포함될 수 있고, 과거 날짜 단어가 다시 선정될 수 있습니다. 당일 발행 기사만을 보장하지 않습니다.
 
-## 최초 설정
+수집·번역·검증 실패 시 새 배포를 중단합니다. 화면은 5분마다 JSON을 다시 읽으며 마지막 갱신 시간을 표시합니다. API 키는 브라우저에 전달하지 않습니다.
 
-1. Settings → Secrets and variables → Actions → **New repository secret**에서 `OPENAI_API_KEY`를 등록합니다. 키를 코드나 이슈에 붙여넣지 마세요.
-2. 선택 사항: 같은 화면의 Variables에서 `OPENAI_MODEL`을 등록합니다. 기본값은 `gpt-4.1-mini`이며 계정에서 사용 가능한 Structured Outputs 지원 모델로 변경할 수 있습니다.
-3. Settings → Pages → Build and deployment → Source를 **GitHub Actions**로 설정합니다.
-4. Actions → **Daily English Words** → **Run workflow**로 첫 실행을 시작합니다.
-5. 성공 후 https://justinpark-97.github.io/spanish/ 에서 확인합니다.
-
-API 키가 없으면 번역·배포는 실패합니다. ChatGPT 구독과 별도로 OpenAI API 사용 요금이 발생할 수 있습니다. 환경 보호 규칙이 있다면 배포 승인도 필요합니다.
-
-## 로컬 실행
-
-Python 3.12 기준:
+## 로컬 실행 (Python 3.12)
 
 ```sh
 python3 -m venv .venv
@@ -39,26 +25,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python scripts/refresh.py --collect-only
-```
-
-번역은 로컬 환경에 `OPENAI_API_KEY`를 설정한 뒤 `python scripts/refresh.py`를 실행합니다. `.env`를 자동 로딩하지 않습니다.
-
-```sh
+SKIP_TRANSLATION=true python scripts/refresh.py
 python -m http.server 8000 --directory site
 ```
 
-http://localhost:8000 에서 확인합니다. HTML 파일을 직접 열면 JSON 요청이 차단될 수 있습니다.
-
-## 파일
-
-- `scripts/refresh.py`: 수집, 무작위 선정, AI 번역, 결과 검증과 원자적 저장
-- `site/index.html`, `site/app.js`: 모바일 대응 단어 카드, 출처 링크, 마지막 갱신 날짜, 5분 자동 확인
-- `.github/workflows/daily.yml`: 예약/수동 실행과 Pages 배포
-- `.github/workflows/check.yml`: 커밋/PR 검증
-- `tests/test_refresh.py`: 출처 검증, 단어 중복 및 잘못된 AI 응답 검증
-
-생성된 JSON은 배포 산출물에 포함되며 저장소에는 커밋하지 않습니다. 브라우저는 API 키 없이 JSON만 읽습니다.
-
-## 번역 없는 화면 미리보기
-
-Actions → Daily English Words → Run workflow에서 `skip_translation`을 선택하면 API를 호출하지 않고 실제 영어 단어 20개와 출처를 배포합니다. 한국어 뜻은 `번역 미사용`으로 표시됩니다. 예약 실행은 기존과 같이 번역을 사용합니다. 로컬에서는 `SKIP_TRANSLATION=true python scripts/refresh.py`로 실행합니다.
+번역 실행은 환경에 `OPENAI_API_KEY`를 설정한 뒤 `python scripts/refresh.py`를 사용합니다. `.env`는 자동 로딩하지 않습니다. 생성된 `site/daily-words.json`은 배포 산출물이며 저장소에 커밋하지 않습니다.
