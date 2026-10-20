@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 23 * * *' # 08:00 Asia/Seoul
   workflow_dispatch:
+    inputs:
+      skip_translation:
+        description: "번역 없이 영어 단어만 배포"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -33,6 +38,7 @@ jobs:
       - name: Collect and translate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SKIP_TRANSLATION: ${{ inputs.skip_translation || false }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: python scripts/refresh.py
       - uses: actions/configure-pages@v5

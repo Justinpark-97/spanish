@@ -44,7 +44,7 @@ async function loadWords() {
     document.getElementById('words').replaceChildren(rows);
     const dateFormat = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'});
     const stale = dateFormat.format(updated) !== dateFormat.format(new Date());
-    status.textContent = `${stale ? '이전 업데이트 자료 · ' : ''}마지막 업데이트: ${updated.toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'})} (한국 시간)`;
+    status.textContent = `${data.translation_enabled === false ? '번역 없이 표시 중 · ' : ''}${stale ? '이전 업데이트 자료 · ' : ''}마지막 업데이트: ${updated.toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'})} (한국 시간)`;
   } catch (error) {
     const hasData = document.getElementById('words').children.length > 0;
     status.textContent = hasData

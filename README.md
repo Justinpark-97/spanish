@@ -58,3 +58,7 @@ http://localhost:8000 에서 확인합니다. HTML 파일을 직접 열면 JSON 
 - `tests/test_refresh.py`: 출처 검증, 단어 중복 및 잘못된 AI 응답 검증
 
 생성된 JSON은 배포 산출물에 포함되며 저장소에는 커밋하지 않습니다. 브라우저는 API 키 없이 JSON만 읽습니다.
+
+## 번역 없는 화면 미리보기
+
+Actions → Daily English Words → Run workflow에서 `skip_translation`을 선택하면 API를 호출하지 않고 실제 영어 단어 20개와 출처를 배포합니다. 한국어 뜻은 `번역 미사용`으로 표시됩니다. 예약 실행은 기존과 같이 번역을 사용합니다. 로컬에서는 `SKIP_TRANSLATION=true python scripts/refresh.py`로 실행합니다.
